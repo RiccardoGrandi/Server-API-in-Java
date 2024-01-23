@@ -13,17 +13,48 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Scanner;
 
-import com.fasterxml.jackson.core.exc.StreamWriteException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class App 
 {
+    public static void main( String[] args )
+    {
+            
+            try {
+                ServerSocket server = new ServerSocket(8080);
+                while(true){
+                    Socket client = server.accept();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                    PrintWriter out = new PrintWriter(client.getOutputStream());
 
-    private static void sendBinaryFile(Socket socket, String path){
+                    String richiesta = "";
 
+                    richiesta = in.readLine();
+                    System.out.println(richiesta);
+                    String[] riga = richiesta.split(" ");
+                    String path = riga[1];
+                    
+                    System.out.println("--" + path + "--");
+
+                    do{
+                        richiesta = in.readLine();
+                        System.out.println(richiesta);
+                        if(richiesta.isEmpty() || richiesta.equals(null)) break;
+                    }while(true);
+
+                    sendBinaryFile(client, path);
+                    
+                    out.flush();
+                    client.close();
+                }          
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+    }
+
+    private static void sendBinaryFile(Socket socket, String path) {
         if(path.endsWith("/")){
             path = path + "index.html";
         }
@@ -33,7 +64,7 @@ public class App
 
         try{
 
-            File file = new File("./root" + path);
+            File file = new File("./htdocs" + path);
             InputStream in = new FileInputStream(file);
             
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
@@ -54,7 +85,7 @@ public class App
             out.close();
             in.close();
         }catch(FileNotFoundException ntF){
-            try{
+            try {
                 DataOutputStream out = new DataOutputStream(socket.getOutputStream());
                 if(getContentType(path).equals("text/plain charset=utf-8\n")){
                     out.writeBytes("HTTP/1.1 301 Move Permanently\n" );
@@ -63,7 +94,7 @@ public class App
                 else
                     out.writeBytes("HTTP/1.1 404 not found");
 
-            }catch(IOException e){
+            } catch(IOException e){
                 System.out.println("IOexception");
             }
         }catch(IOException e){
@@ -74,7 +105,7 @@ public class App
 
     private static String getContentType(String path){
         String type = "text/plain charset=utf-8\n";
-        try{
+        try {
             type = path.split("\\.")[1];
             System.out.println("----------------------- "+ type);
             switch (type) {
@@ -93,13 +124,11 @@ public class App
                     type = "application/" + type;
                     break;
             }
-        }catch(IndexOutOfBoundsException inxU){
+        } catch(IndexOutOfBoundsException inxU){
             System.out.println(type);
         }
         return type;
     }
-
-    /*creazione della classe */
 
     private static void creaClasse(){
         Alunno a1 = new Alunno("Mattia", "Pascal", new Date(1904 - 1900, 0, 1));
@@ -120,52 +149,12 @@ public class App
         System.out.println("creata la classe");
         
         ObjectMapper objectMapper = new ObjectMapper();
+
         try {
-            objectMapper.writeValue(new File("root/classe.json"), classe);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-
-    }
-
-    public static void main( String[] args )
-    {
-        
-        try {
-            ServerSocket server = new ServerSocket(8080);
-            while(true){
-                Socket client = server.accept();
-                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                PrintWriter out = new PrintWriter(client.getOutputStream());
-
-                String richiesta = "";
-
-                richiesta = in.readLine();
-                System.out.println(richiesta);
-                String[] riga = richiesta.split(" ");
-                String path = riga[1];
-                
-                
-                
-                System.out.println("--" + path + "--");
-
-                do{
-                    richiesta = in.readLine();
-                    System.out.println(richiesta);
-                    if(richiesta.isEmpty() || richiesta.equals(null)) break;
-                }while(true);
-
-                sendBinaryFile(client, path);
-                
-                out.flush();
-                client.close();
-            }          
+            objectMapper.writeValue(new File("htdocs/classe.json"), classe);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 }
