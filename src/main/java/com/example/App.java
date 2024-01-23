@@ -20,38 +20,37 @@ public class App
 {
     public static void main( String[] args )
     {
-            
-            try {
-                ServerSocket server = new ServerSocket(8080);
-                while(true){
-                    Socket client = server.accept();
-                    BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-                    PrintWriter out = new PrintWriter(client.getOutputStream());
+        try {
+            ServerSocket server = new ServerSocket(8080);
+            while(true){
+                Socket client = server.accept();
+                BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                PrintWriter out = new PrintWriter(client.getOutputStream());
 
-                    String richiesta = "";
+                String richiesta = "";
 
+                richiesta = in.readLine();
+                System.out.println(richiesta);
+                String[] riga = richiesta.split(" ");
+                String path = riga[1];
+                
+                System.out.println("--" + path + "--");
+
+                do{
                     richiesta = in.readLine();
                     System.out.println(richiesta);
-                    String[] riga = richiesta.split(" ");
-                    String path = riga[1];
-                    
-                    System.out.println("--" + path + "--");
+                    if(richiesta.isEmpty() || richiesta.equals(null)) break;
+                }while(true);
 
-                    do{
-                        richiesta = in.readLine();
-                        System.out.println(richiesta);
-                        if(richiesta.isEmpty() || richiesta.equals(null)) break;
-                    }while(true);
+                sendBinaryFile(client, path);
+                
+                out.flush();
+                client.close();
+            }          
 
-                    sendBinaryFile(client, path);
-                    
-                    out.flush();
-                    client.close();
-                }          
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static void sendBinaryFile(Socket socket, String path) {
@@ -84,10 +83,12 @@ public class App
             } 
             out.close();
             in.close();
+
         }catch(FileNotFoundException ntF){
             try {
                 DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-                if(getContentType(path).equals("text/plain charset=utf-8\n")){
+                
+                if(getContentType(path).equals("text/plain charset=utf-8\n")) {
                     out.writeBytes("HTTP/1.1 301 Move Permanently\n" );
                     out.writeBytes("location: " + path+"/");
                 }
@@ -97,14 +98,15 @@ public class App
             } catch(IOException e){
                 System.out.println("IOexception");
             }
-        }catch(IOException e){
+        } catch(IOException e){
             System.out.println("IOexception");
         }
            
     }
 
-    private static String getContentType(String path){
+    private static String getContentType(String path) {
         String type = "text/plain charset=utf-8\n";
+        
         try {
             type = path.split("\\.")[1];
             System.out.println("----------------------- "+ type);
@@ -127,15 +129,16 @@ public class App
         } catch(IndexOutOfBoundsException inxU){
             System.out.println(type);
         }
+        
         return type;
     }
 
     private static void creaClasse(){
-        Alunno a1 = new Alunno("Mattia", "Pascal", new Date(1904 - 1900, 0, 1));
-        Alunno a2 = new Alunno("Riccardo","Grandi", new Date(2005 - 1900, 0, 20));
-        Alunno a3 = new Alunno("Anatolie", "Pavlov", new Date(2003 - 1900, 11, 10));
-        Alunno a4 = new Alunno("Alessio", "Didi", new Date(2005 - 1900, 4, 03));
-        Alunno a5 = new Alunno("Gigi", "Topo", new Date(2004 - 1900, 1, 28));
+        Alunno a1 = new Alunno("Mattia", "Pascal", "01/01/1904");
+        Alunno a2 = new Alunno("Riccardo","Grandi", "20/01/2005");
+        Alunno a3 = new Alunno("Anatolie", "Pavlov", "10/12/2003");
+        Alunno a4 = new Alunno("Alessio", "Didi", "03/05/2005");
+        Alunno a5 = new Alunno("Gigi", "Topo", "28/02/2004");
 
         ArrayList<Alunno> alunni = new ArrayList<>();
         alunni.add(a1);

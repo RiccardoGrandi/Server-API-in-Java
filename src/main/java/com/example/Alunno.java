@@ -5,12 +5,12 @@ import java.util.Date;
 public class Alunno {
     public String nome;
     public String cognome;
-    public Date dataDiNascita;
+    public String dataDiNascita;
 
     public Alunno() {
     }
 
-    public Alunno(String nome, String cognome, Date dataDiNascita) {
+    public Alunno(String nome, String cognome, String dataDiNascita) {
         this.nome = nome;
         this.cognome = cognome;
         this.dataDiNascita = dataDiNascita;
@@ -32,11 +32,11 @@ public class Alunno {
         this.cognome = cognome;
     }
 
-    public Date getDataDiNascita() {
+    public String getDataDiNascita() {
         return this.dataDiNascita;
     }
 
-    public void setDataDiNascita(Date dataDiNascita) {
+    public void setDataDiNascita(String dataDiNascita) {
         this.dataDiNascita = dataDiNascita;
     }
     
